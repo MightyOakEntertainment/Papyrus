@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'about.dart';
 import 'settings.dart';
@@ -52,7 +53,10 @@ class _PanelWidgetState extends State<PanelWidget> {
   bool shadowColor = false;
   bool showWebControls = true;
   double? scrolledUnderElevation;
+  String _codexURL = 'http://0.0.0.0:9810/f/0/1';
   List<MenuItemButton> webViewMenu = List<MenuItemButton>.empty(growable: true);
+
+  final prefs = SharedPreferences.getInstance();
 
   late final WebViewController controller;
 
@@ -69,6 +73,14 @@ class _PanelWidgetState extends State<PanelWidget> {
       ),
     );
   }*/
+
+  Future<void> _loadSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _codexURL = prefs.getString('codexURL') ?? globals.codexPath;
+      controller.loadRequest(Uri.parse(_codexURL),);
+    });
+  }
 
   Future<void> _onClearCookies() async {
     final hadCookies = await cookieManager.clearCookies();
@@ -94,6 +106,7 @@ class _PanelWidgetState extends State<PanelWidget> {
   @override
   void initState() {
     super.initState();
+    _loadSettings();
     controller = WebViewController()
       ..loadRequest(
         Uri.parse(globals.codexPath),
