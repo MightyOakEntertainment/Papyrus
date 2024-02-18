@@ -45,19 +45,20 @@ class _SettingsPanelState extends State<SettingsPanel> {
         Card(
           child: ListTile(
             leading: Icon(Icons.visibility),
-            title: Text('Codex URL'),
-            subtitle: TextFormField(
-              initialValue: _codexURL!,
-              decoration: const InputDecoration(
-                hintText: 'This is for your Codex Homepage.',
-                labelText: 'URL',
-              ),
-              onSaved: (String? value) {
+            title: TextField(
+              controller: TextEditingController()..text = _codexURL!,
+              keyboardType: TextInputType.url,
+              onSubmitted: (String? value) {
                 setState(() {
                   _codexURL = value!;
                   widget.manager.codexURL = _codexURL;
                 });
               },
+              decoration: const InputDecoration(
+                hintText: 'This is for your Codex Homepage.',
+                labelText: 'Codex URL',
+                border: OutlineInputBorder(),
+              ),
             ),
           ),
         ),
@@ -82,14 +83,15 @@ class _SettingsPanelState extends State<SettingsPanel> {
               ),
               ListTile(
                 leading: Icon(Icons.rss_feed),
-                title: Text('OPDS URL'),
-                subtitle: TextFormField(
-                  initialValue: _opdsURL!,
+                title: TextField(
+                  controller: TextEditingController()..text = _opdsURL!,
+                  keyboardType: TextInputType.url,
                   decoration: const InputDecoration(
                     hintText: 'This is for your OPDS Feeds URL.',
-                    labelText: 'URL',
+                    labelText: 'OPSD URL',
+                    border: OutlineInputBorder(),
                   ),
-                  onSaved: (String? value) {
+                  onSubmitted: (String? value) {
                     setState(() {
                       _opdsURL = value!;
                       widget.manager.opdsURL = _opdsURL;
@@ -107,14 +109,14 @@ class _SettingsPanelState extends State<SettingsPanel> {
             children: <Widget>[
               ListTile(
                 leading: Icon(Icons.person),
-                title: Text('OPDS Username'),
-                subtitle: TextFormField(
-                  initialValue: _opdsUsername!,
+                title: TextField(
+                  controller: TextEditingController()..text = _opdsUsername!,
                   decoration: const InputDecoration(
                     hintText: 'Optionally you may add your OPDS Username.',
-                    labelText: 'Username',
+                    labelText: 'OPDS Username',
+                    border: OutlineInputBorder(),
                   ),
-                  onSaved: (String? value) {
+                  onSubmitted: (String? value) {
                     setState(() {
                       _opdsUsername = value!;
                       widget.manager.setUsername(_opdsUsername);
@@ -124,13 +126,15 @@ class _SettingsPanelState extends State<SettingsPanel> {
               ),
               ListTile(
                 leading: Icon(Icons.password),
-                title: Text('OPDS Password'),
-                subtitle: TextFormField(
+                title: TextField(
+                  obscureText: true,
+                  controller: TextEditingController()..text = _opdsPassword!,
                   decoration: const InputDecoration(
                     hintText: 'Optionally you may add your OPDS Password.',
-                    labelText: 'Password',
+                    labelText: 'OPDS Password',
+                    border: OutlineInputBorder(),
                   ),
-                  onSaved: (String? value) {
+                  onSubmitted: (String? value) {
                     setState(() {
                       _opdsPassword = value!;
                       widget.manager.setPassword(_opdsPassword);

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'about.dart';
 import 'settings.dart';
@@ -9,7 +8,6 @@ import 'navigation_controls.dart';
 import 'settings_manager.dart';
 import 'service_locator.dart';
 
-import 'globals.dart' as globals;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -73,10 +71,10 @@ class _PanelWidgetState extends State<PanelWidget> {
     final username = await settingsManager.getUsername();
     final password = await settingsManager.getPassword();
     setState(() {
-      _codexURL     = settingsManager.codexURL ?? globals.codexPath;
+      _codexURL     = settingsManager.codexURL ?? "http://192.168.0.0:9810/f/0/1";
       _webControls  = settingsManager.showWebControls;
       _opdsV2       = settingsManager.opdsV2;
-      _opdsURL      = settingsManager.opdsURL;
+      _opdsURL      = settingsManager.opdsURL ?? "http://192.168.0.0:9810/opds/v1.2/r/0/1";
       _opdsUsername = username ?? "";
       _opdsPassword = password ?? "";
       controller.loadRequest(Uri.parse(_codexURL),);
@@ -123,11 +121,8 @@ class _PanelWidgetState extends State<PanelWidget> {
   @override
   void initState() {
     super.initState();
+    controller = WebViewController();
     _loadSettings();
-    controller = WebViewController()
-      ..loadRequest(
-        Uri.parse(globals.codexPath),
-      );
     controller
       ..setNavigationDelegate(
         NavigationDelegate(
@@ -200,7 +195,7 @@ class _PanelWidgetState extends State<PanelWidget> {
         actions: <Widget>[
           if(_panelIndex == 0) ...[
             if(_webControls) ...[
-              NavigationControls(controller: controller),
+              NavigationControls(manager: settingsManager, controller: controller),
             ],
             MenuAnchor(
             builder: (BuildContext context, MenuController controller, Widget? child) {

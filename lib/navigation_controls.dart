@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-import 'globals.dart' as globals;
+import 'settings_manager.dart';
 
 class NavigationControls extends StatelessWidget {
-  const NavigationControls({required this.controller, super.key});
+   NavigationControls({super.key, required this.manager, required this.controller});
 
+  final SettingsManager manager;
   final WebViewController controller;
+
+  String  _codexURL     = "http://192.168.0.0:9810/f/0/1";
+
+  Future<void> _loadSettings() async {
+      _codexURL = manager.codexURL ?? "http://192.168.0.0:9810/f/0/1";
+  }
 
   @override
   Widget build(BuildContext context) {
+    _loadSettings();
     return Row(
       children: <Widget>[
         IconButton(
@@ -49,7 +57,7 @@ class NavigationControls extends StatelessWidget {
         IconButton(
           icon: const Icon(Icons.home),
           onPressed: () {
-            controller.loadRequest(Uri.parse(globals.codexPath));
+            controller.loadRequest(Uri.parse(_codexURL));
           },
         ),
       ],
