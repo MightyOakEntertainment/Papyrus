@@ -1,65 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+import 'settings_manager.dart';
 
 class SettingsPanel extends StatefulWidget {
-  const SettingsPanel({super.key});
+  const SettingsPanel({super.key, required this.manager});
+
+  final SettingsManager manager;
 
   @override
   State<SettingsPanel> createState() => _SettingsPanelState();
 }
 
 class _SettingsPanelState extends State<SettingsPanel> {
-  final storage = const FlutterSecureStorage();
 
-  String _codexURL = 'http://0.0.0.0:9810/f/0/1';
-  bool _opdsV2 = false;
-  String _opdsURL = 'http://0.0.0.0:9810/opds/v1.2/r/0/1';
-  String _opdsUsername = '';
-  String _opdsPassword = '';
+  String  _codexURL      = "http://192.168.0.0:9810/f/0/1";
+  bool    _opdsV2        = false;
+  String  _opdsURL       = "http://192.168.0.0:9810/opds/v1.2/r/0/1";
+  String  _opdsUsername  = "";
+  String  _opdsPassword  = "";
 
   Future<void> _loadSettings() async {
-    final prefs = await SharedPreferences.getInstance();
+    final username = await widget.manager.getUsername();
+    final password = await widget.manager.getPassword();
     setState(() {
-      _codexURL = prefs.getString('codexURL') ?? 'http://0.0.0.0:9810/f/0/1';
-      _opdsV2 = prefs.getBool('opdsV2') ?? false;
-      _opdsURL = prefs.getString('opdsURL') ?? 'http://0.0.0.0:9810/opds/v1.2/r/0/1';
-    });
-
-    final username = await storage.read(key: 'username') ?? '';
-    final password = await storage.read(key: 'password') ?? '';
-  }
-
-  Future<void> _saveCodexURL() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      prefs.setString('codexURL', _codexURL);
-    });
-  }
-
-  Future<void> _saveOpdsV2() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      prefs.setBool('opdsV2', _opdsV2);
-    });
-  }
-
-  Future<void> _saveOpdsURL() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      prefs.setString('opdsURL', _opdsURL);
-    });
-  }
-
-  Future<void> _saveOpdsUsername() async {
-    setState(() async {
-      await storage.write(key: 'username', value: _opdsUsername!);
-    });
-  }
-
-  Future<void> _saveOpdsPassword() async {
-    setState(() async {
-      await storage.write(key: 'password', value: _opdsPassword!);
+      _codexURL     = widget.manager.codexURL;
+      _opdsV2       = widget.manager.opdsV2;
+      _opdsURL      = widget.manager.opdsURL;
+      _opdsUsername = username ?? "";
+      _opdsPassword = password ?? "";
     });
   }
 
@@ -71,7 +39,6 @@ class _SettingsPanelState extends State<SettingsPanel> {
 
   @override
   Widget build(BuildContext context) {
-    _loadSettings();
     return ListView(
       children: <Widget>[
         Text('Codex'),
@@ -88,7 +55,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
               onSaved: (String? value) {
                 setState(() {
                   _codexURL = value!;
-                  _saveCodexURL();
+                  widget.manager.codexURL = _codexURL;
                 });
               },
             ),
@@ -107,7 +74,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
                   onChanged: (bool? value) {
                     setState(() {
                       _opdsV2 = value!;
-                      _saveOpdsV2();
+                      widget.manager.opdsV2 = _opdsV2;
                     });
                     },
                   value: _opdsV2,
@@ -125,7 +92,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
                   onSaved: (String? value) {
                     setState(() {
                       _opdsURL = value!;
-                      _saveOpdsURL();
+                      widget.manager.opdsURL = _opdsURL;
                     });
                   },
                 ),
@@ -150,7 +117,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
                   onSaved: (String? value) {
                     setState(() {
                       _opdsUsername = value!;
-                      _saveOpdsUsername();
+                      widget.manager.setUsername(_opdsUsername);
                     });
                   },
                 ),
@@ -166,7 +133,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
                   onSaved: (String? value) {
                     setState(() {
                       _opdsPassword = value!;
-                      _saveOpdsPassword();
+                      widget.manager.setPassword(_opdsPassword);
                     });
                   },
                 ),

@@ -6,10 +6,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'about.dart';
 import 'settings.dart';
 import 'navigation_controls.dart';
+import 'settings_manager.dart';
+import 'service_locator.dart';
 
 import 'globals.dart' as globals;
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await setupServiceLocator();
+
   runApp(const Papyrus());
 }
 
@@ -56,7 +62,7 @@ class _PanelWidgetState extends State<PanelWidget> {
   String _codexURL = 'http://0.0.0.0:9810/f/0/1';
   List<MenuItemButton> webViewMenu = List<MenuItemButton>.empty(growable: true);
 
-  final prefs = SharedPreferences.getInstance();
+  final settingsManager = serviceLocator<SettingsManager>();
 
   late final WebViewController controller;
 
@@ -145,7 +151,7 @@ class _PanelWidgetState extends State<PanelWidget> {
       ..setJavaScriptMode(JavaScriptMode.unrestricted);
 
     panels.add(AppPanel('Codex', Icon(Icons.visibility_outlined), Icon(Icons.visibility), WebViewWidget(controller: controller)));
-    panels.add(AppPanel('Settings', Icon(Icons.settings_outlined), Icon(Icons.settings), SettingsPanel()));
+    panels.add(AppPanel('Settings', Icon(Icons.settings_outlined), Icon(Icons.settings), SettingsPanel(manager: settingsManager)));
     panels.add(AppPanel('About', Icon(Icons.info_outlined), Icon(Icons.info), AboutPanel()));
   }
 
