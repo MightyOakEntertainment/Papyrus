@@ -57,12 +57,31 @@ class _PanelWidgetState extends State<PanelWidget> {
   int loadingPercentage = 0;
   bool fullscreenMode = false;
   bool shadowColor = false;
-  bool showWebControls = true;
   double? scrolledUnderElevation;
-  String _codexURL = 'http://0.0.0.0:9810/f/0/1';
   List<MenuItemButton> webViewMenu = List<MenuItemButton>.empty(growable: true);
 
   final settingsManager = serviceLocator<SettingsManager>();
+
+  String  _codexURL     = "http://192.168.0.0:9810/f/0/1";
+  bool    _webControls  = false;
+  bool    _opdsV2       = false;
+  String  _opdsURL      = "http://192.168.0.0:9810/opds/v1.2/r/0/1";
+  String  _opdsUsername = "";
+  String  _opdsPassword = "";
+
+  Future<void> _loadSettings() async {
+    final username = await settingsManager.getUsername();
+    final password = await settingsManager.getPassword();
+    setState(() {
+      _codexURL     = settingsManager.codexURL ?? globals.codexPath;
+      _webControls  = settingsManager.showWebControls;
+      _opdsV2       = settingsManager.opdsV2;
+      _opdsURL      = settingsManager.opdsURL;
+      _opdsUsername = username ?? "";
+      _opdsPassword = password ?? "";
+      controller.loadRequest(Uri.parse(_codexURL),);
+    });
+  }
 
   late final WebViewController controller;
 
@@ -79,14 +98,6 @@ class _PanelWidgetState extends State<PanelWidget> {
       ),
     );
   }*/
-
-  Future<void> _loadSettings() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _codexURL = prefs.getString('codexURL') ?? globals.codexPath;
-      controller.loadRequest(Uri.parse(_codexURL),);
-    });
-  }
 
   Future<void> _onClearCookies() async {
     final hadCookies = await cookieManager.clearCookies();
@@ -161,8 +172,11 @@ class _PanelWidgetState extends State<PanelWidget> {
     webViewMenu.clear();
     webViewMenu.add(MenuItemButton(
       onPressed: () =>
-          setState(() => showWebControls = !showWebControls),
-      child: showWebControls ? const Text('Hide Web Controls') : const Text('Show Web Controls'),
+          setState(() {
+            _webControls = !_webControls;
+            settingsManager.showWebControls = _webControls;
+          }),
+      child: _webControls ? const Text('Hide Web Controls') : const Text('Show Web Controls'),
     ),);
     /*webViewMenu.add(MenuItemButton(
       onPressed: () =>
@@ -185,7 +199,7 @@ class _PanelWidgetState extends State<PanelWidget> {
         shadowColor: shadowColor ? Theme.of(context).colorScheme.shadow : null,
         actions: <Widget>[
           if(_panelIndex == 0) ...[
-            if(showWebControls) ...[
+            if(_webControls) ...[
               NavigationControls(controller: controller),
             ],
             MenuAnchor(
