@@ -23,6 +23,9 @@ Padding paddedTile(ListTile tile){
   );
 }
 
+RoundedRectangleBorder cardBorder = RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0));
+OutlineInputBorder textFieldBorder = OutlineInputBorder(borderRadius: BorderRadius.circular(10.0));
+
 class SettingsPanel extends StatefulWidget {
   const SettingsPanel({super.key, required this.manager});
 
@@ -62,10 +65,11 @@ class _SettingsPanelState extends State<SettingsPanel> {
   Widget build(BuildContext context) {
     return paddedList(ListView(
         children: <Widget>[
-          paddedTitle(Text('Codex')),
+          paddedTitle(const Text('Codex')),
           Card(
+            shape: cardBorder,
             child: paddedTile(ListTile(
-              leading: Icon(Icons.visibility),
+              leading: const Icon(Icons.visibility),
               title: TextField(
                 controller: TextEditingController()..text = _codexURL!,
                 keyboardType: TextInputType.url,
@@ -75,67 +79,69 @@ class _SettingsPanelState extends State<SettingsPanel> {
                     widget.manager.codexURL = _codexURL;
                   });
                   },
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: 'This is for your Codex Homepage.',
                   labelText: 'Codex URL',
-                  border: OutlineInputBorder(),
+                  border: textFieldBorder,
                 ),
               ),
             )),
           ),
-          paddedTitle(Text('OPDS')),
+          paddedTitle(const Text('OPDS')),
           Card(
-      child: ListView(
-        shrinkWrap: true,
-        children: <Widget>[
-          paddedTile(ListTile(
-            leading: Icon(Icons.warning),
-            title: Text('Use OPDS v2.0'),
-            subtitle: Text('OPDS v2 is experimental and not widely or well supported!'),
-            trailing: Switch(
-              onChanged: (bool? value) {
-                setState(() {
-                  _opdsV2 = value!;
-                  widget.manager.opdsV2 = _opdsV2;
-                });
-              },
-              value: _opdsV2,
-            ),
-          )),
-          paddedTile(ListTile(
-            leading: Icon(Icons.rss_feed),
-            title: TextField(
-              controller: TextEditingController()..text = _opdsURL!,
-              keyboardType: TextInputType.url,
-              decoration: const InputDecoration(
-                hintText: 'This is for your OPDS Feeds URL.',
-                labelText: 'OPSD URL',
-                border: OutlineInputBorder(),
-              ),
-              onSubmitted: (String? value) {
-                setState(() {
-                  _opdsURL = value!;
-                  widget.manager.opdsURL = _opdsURL;
-                });
-              },
-            ),
-          )),
-        ],
-      ),
-    ),
-          paddedTitle(Text('Optional')),
-          Card(
+            shape: cardBorder,
             child: ListView(
               shrinkWrap: true,
               children: <Widget>[
                 paddedTile(ListTile(
-                  leading: Icon(Icons.person),
+                  leading: const Icon(Icons.warning),
+                  title: const Text('Use OPDS v2.0'),
+                  subtitle: const Text('OPDS v2 is experimental and not widely or well supported!'),
+                  trailing: Switch(
+                    onChanged: (bool? value) {
+                      setState(() {
+                        _opdsV2 = value!;
+                        widget.manager.opdsV2 = _opdsV2;
+                      });
+                      },
+                    value: _opdsV2,
+                  ),
+                )),
+                paddedTile(ListTile(
+                  leading: const Icon(Icons.rss_feed),
+                  title: TextField(
+                    controller: TextEditingController()..text = _opdsURL!,
+                    keyboardType: TextInputType.url,
+                    decoration: InputDecoration(
+                      hintText: 'This is for your OPDS Feeds URL.',
+                      labelText: 'OPSD URL',
+                      border: textFieldBorder,
+                    ),
+                    onSubmitted: (String? value) {
+                      setState(() {
+                        _opdsURL = value!;
+                        widget.manager.opdsURL = _opdsURL;
+                      });
+                      },
+                  ),
+                )),
+              ],
+            ),
+          ),
+          paddedTitle(const Text('Optional')),
+          Card(
+            shape: cardBorder,
+            child: ListView(
+              shrinkWrap: true,
+              children: <Widget>[
+                paddedTile(ListTile(
+                  leading: const Icon(Icons.person),
                   title: TextField(
                     controller: TextEditingController()..text = _opdsUsername!,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: 'Optionally you may add your OPDS Username.',
                       labelText: 'OPDS Username',
-                      border: OutlineInputBorder(),
+                      border: textFieldBorder,
                     ),
                     onSubmitted: (String? value) {
                       setState(() {
@@ -146,14 +152,14 @@ class _SettingsPanelState extends State<SettingsPanel> {
                   ),
                 )),
                 paddedTile(ListTile(
-                  leading: Icon(Icons.password),
+                  leading: const Icon(Icons.password),
                   title: TextField(
                     obscureText: true,
                     controller: TextEditingController()..text = _opdsPassword!,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: 'Optionally you may add your OPDS Password.',
                       labelText: 'OPDS Password',
-                      border: OutlineInputBorder(),
+                      border: textFieldBorder,
                     ),
                     onSubmitted: (String? value) {
                       setState(() {
