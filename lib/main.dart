@@ -34,6 +34,9 @@ class Papyrus extends StatelessWidget {
         cardTheme: CardTheme(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
         ),
+        inputDecorationTheme: InputDecorationTheme(
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.0)),
+        ),
       ),
       home: const PanelWidget(),
     );

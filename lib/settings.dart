@@ -23,8 +23,6 @@ Padding paddedTile(ListTile tile){
   );
 }
 
-OutlineInputBorder textFieldBorder = OutlineInputBorder(borderRadius: BorderRadius.circular(10.0));
-
 class SettingsPanel extends StatefulWidget {
   const SettingsPanel({super.key, required this.manager});
 
@@ -77,10 +75,9 @@ class _SettingsPanelState extends State<SettingsPanel> {
                     widget.manager.codexURL = _codexURL;
                   });
                   },
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'This is for your Codex Homepage.',
                   labelText: 'Codex URL',
-                  border: textFieldBorder,
                 ),
               ),
             )),
@@ -109,10 +106,9 @@ class _SettingsPanelState extends State<SettingsPanel> {
                   title: TextField(
                     controller: TextEditingController()..text = _opdsURL,
                     keyboardType: TextInputType.url,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'This is for your OPDS Feeds URL.',
                       labelText: 'OPDS URL',
-                      border: textFieldBorder,
                     ),
                     onSubmitted: (String? value) {
                       setState(() {
@@ -134,10 +130,9 @@ class _SettingsPanelState extends State<SettingsPanel> {
                   leading: const Icon(Icons.person),
                   title: TextField(
                     controller: TextEditingController()..text = _opdsUsername,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Optionally you may add your OPDS Username.',
                       labelText: 'OPDS Username',
-                      border: textFieldBorder,
                     ),
                     onSubmitted: (String? value) {
                       setState(() {
@@ -152,10 +147,9 @@ class _SettingsPanelState extends State<SettingsPanel> {
                   title: TextField(
                     obscureText: true,
                     controller: TextEditingController()..text = _opdsPassword,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Optionally you may add your OPDS Password.',
                       labelText: 'OPDS Password',
-                      border: textFieldBorder,
                     ),
                     onSubmitted: (String? value) {
                       setState(() {
