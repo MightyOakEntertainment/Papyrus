@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -45,13 +46,17 @@ class SettingsManager {
   Future<String> getUsername() async {
     final value = await _secureStorage.read(key: _usernameKey);
 
-    print('Retrieved $_usernameKey: $value');
+    if (kDebugMode) {
+      print('Retrieved $_usernameKey: $value');
+    }
 
     return value ?? "";
   }
 
   void setUsername(String value) async {
-    print('Saving $_usernameKey: $value');
+    if (kDebugMode) {
+      print('Saving $_usernameKey: $value');
+    }
 
     await _secureStorage.write(key: _usernameKey, value: value);
   }
@@ -59,13 +64,17 @@ class SettingsManager {
   Future<String> getPassword() async {
     final value = await _secureStorage.read(key: _passwordKey);
 
-    print('Retrieved $_passwordKey: $value');
+    if (kDebugMode) {
+      print('Retrieved $_passwordKey: $value');
+    }
 
     return value ?? "";
   }
 
    void setPassword(String value) async {
-     print('Saving $_passwordKey: $value');
+     if (kDebugMode) {
+       print('Saving $_passwordKey: $value');
+     }
 
      await _secureStorage.write(key: _passwordKey, value: value);
   }
@@ -75,14 +84,18 @@ class SettingsManager {
       // Retrieve data from shared preferences
       var value = _preferences.get(key);
 
-      print('Retrieved $key: $value');
+      if (kDebugMode) {
+        print('Retrieved $key: $value');
+      }
 
       return value;
     }
 
 // Private method for saving data to Shared Preferences
     void _saveData(String key, dynamic value) {
-      print('Saving $key: $value');
+      if (kDebugMode) {
+        print('Saving $key: $value');
+      }
 
       // Save data to Shared Preferences
       if (value is String) {

@@ -16,8 +16,8 @@ class _AboutPanelState extends State<AboutPanel> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: const Text('From Mighty Oak Entertainment\nThank You!'),
+    return const Center(
+      child: Text('From Mighty Oak Entertainment\nThank You!'),
     );
   }
 }

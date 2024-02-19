@@ -23,7 +23,6 @@ Padding paddedTile(ListTile tile){
   );
 }
 
-RoundedRectangleBorder cardBorder = RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0));
 OutlineInputBorder textFieldBorder = OutlineInputBorder(borderRadius: BorderRadius.circular(10.0));
 
 class SettingsPanel extends StatefulWidget {
@@ -50,8 +49,8 @@ class _SettingsPanelState extends State<SettingsPanel> {
       _codexURL     = widget.manager.codexURL;
       _opdsV2       = widget.manager.opdsV2;
       _opdsURL      = widget.manager.opdsURL;
-      _opdsUsername = username ?? "";
-      _opdsPassword = password ?? "";
+      _opdsUsername = username;
+      _opdsPassword = password;
     });
   }
 
@@ -67,11 +66,10 @@ class _SettingsPanelState extends State<SettingsPanel> {
         children: <Widget>[
           paddedTitle(const Text('Codex')),
           Card(
-            shape: cardBorder,
             child: paddedTile(ListTile(
               leading: const Icon(Icons.visibility),
               title: TextField(
-                controller: TextEditingController()..text = _codexURL!,
+                controller: TextEditingController()..text = _codexURL,
                 keyboardType: TextInputType.url,
                 onSubmitted: (String? value) {
                   setState(() {
@@ -89,7 +87,6 @@ class _SettingsPanelState extends State<SettingsPanel> {
           ),
           paddedTitle(const Text('OPDS')),
           Card(
-            shape: cardBorder,
             child: ListView(
               shrinkWrap: true,
               children: <Widget>[
@@ -110,11 +107,11 @@ class _SettingsPanelState extends State<SettingsPanel> {
                 paddedTile(ListTile(
                   leading: const Icon(Icons.rss_feed),
                   title: TextField(
-                    controller: TextEditingController()..text = _opdsURL!,
+                    controller: TextEditingController()..text = _opdsURL,
                     keyboardType: TextInputType.url,
                     decoration: InputDecoration(
                       hintText: 'This is for your OPDS Feeds URL.',
-                      labelText: 'OPSD URL',
+                      labelText: 'OPDS URL',
                       border: textFieldBorder,
                     ),
                     onSubmitted: (String? value) {
@@ -130,14 +127,13 @@ class _SettingsPanelState extends State<SettingsPanel> {
           ),
           paddedTitle(const Text('Optional')),
           Card(
-            shape: cardBorder,
             child: ListView(
               shrinkWrap: true,
               children: <Widget>[
                 paddedTile(ListTile(
                   leading: const Icon(Icons.person),
                   title: TextField(
-                    controller: TextEditingController()..text = _opdsUsername!,
+                    controller: TextEditingController()..text = _opdsUsername,
                     decoration: InputDecoration(
                       hintText: 'Optionally you may add your OPDS Username.',
                       labelText: 'OPDS Username',
@@ -155,7 +151,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
                   leading: const Icon(Icons.password),
                   title: TextField(
                     obscureText: true,
-                    controller: TextEditingController()..text = _opdsPassword!,
+                    controller: TextEditingController()..text = _opdsPassword,
                     decoration: InputDecoration(
                       hintText: 'Optionally you may add your OPDS Password.',
                       labelText: 'OPDS Password',

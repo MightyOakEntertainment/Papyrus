@@ -31,6 +31,9 @@ class Papyrus extends StatelessWidget {
           brightness: Brightness.dark,
         ),
         useMaterial3: true,
+        cardTheme: CardTheme(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+        ),
       ),
       home: const PanelWidget(),
     );
@@ -65,21 +68,24 @@ class _PanelWidgetState extends State<PanelWidget> {
 
   String  _codexURL     = "http://192.168.0.0:9810/f/0/1";
   bool    _webControls  = false;
-  bool    _opdsV2       = false;
+  //Not Needed Until OPDS Implementation
+  /*bool    _opdsV2       = false;
   String  _opdsURL      = "http://192.168.0.0:9810/opds/v1.2/r/0/1";
   String  _opdsUsername = "";
-  String  _opdsPassword = "";
+  String  _opdsPassword = "";*/
 
   Future<void> _loadSettings() async {
-    final username = await settingsManager.getUsername();
-    final password = await settingsManager.getPassword();
+    //Not Needed Until OPDS Implementation
+    /*final username = await settingsManager.getUsername();
+    final password = await settingsManager.getPassword();*/
     setState(() {
-      _codexURL     = settingsManager.codexURL ?? "http://192.168.0.0:9810/f/0/1";
+      _codexURL     = settingsManager.codexURL;
       _webControls  = settingsManager.showWebControls;
-      _opdsV2       = settingsManager.opdsV2;
-      _opdsURL      = settingsManager.opdsURL ?? "http://192.168.0.0:9810/opds/v1.2/r/0/1";
-      _opdsUsername = username ?? "";
-      _opdsPassword = password ?? "";
+      //Not Needed Until OPDS Implementation
+      /*_opdsV2       = settingsManager.opdsV2;
+      _opdsURL      = settingsManager.opdsURL;
+      _opdsUsername = username;
+      _opdsPassword = password;*/
       controller.loadRequest(Uri.parse(_codexURL),);
     });
   }
@@ -89,6 +95,7 @@ class _PanelWidgetState extends State<PanelWidget> {
   final cookieManager = WebViewCookieManager();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  //Lists -- for Codex so kind of useless but kept for future reference
   /*Future<void> _onListCookies(WebViewController controller) async {
     final String cookies = await controller
         .runJavaScriptReturningResult('document.cookie') as String;
@@ -159,9 +166,9 @@ class _PanelWidgetState extends State<PanelWidget> {
       )
       ..setJavaScriptMode(JavaScriptMode.unrestricted);
 
-    panels.add(AppPanel('Codex', Icon(Icons.visibility_outlined), Icon(Icons.visibility), WebViewWidget(controller: controller)));
-    panels.add(AppPanel('Settings', Icon(Icons.settings_outlined), Icon(Icons.settings), SettingsPanel(manager: settingsManager)));
-    panels.add(AppPanel('About', Icon(Icons.info_outlined), Icon(Icons.info), AboutPanel()));
+    panels.add(AppPanel('Codex', const Icon(Icons.visibility_outlined), const Icon(Icons.visibility), WebViewWidget(controller: controller)));
+    panels.add(AppPanel('Settings', const Icon(Icons.settings_outlined), const Icon(Icons.settings), SettingsPanel(manager: settingsManager)));
+    panels.add(const AppPanel('About', Icon(Icons.info_outlined), Icon(Icons.info), AboutPanel()));
   }
 
 
@@ -176,11 +183,14 @@ class _PanelWidgetState extends State<PanelWidget> {
           }),
       child: _webControls ? const Text('Hide Web Controls') : const Text('Show Web Controls'),
     ),);
+
+    //Kept encase I want to re-enable the 'List Cookies' Option
     /*webViewMenu.add(MenuItemButton(
       onPressed: () =>
           setState(() => _onListCookies(controller)),
       child: const Text('List cookies'),
     ),);*/
+
     webViewMenu.add(MenuItemButton(
       onPressed: () =>
           setState(() => _onClearCookies()),
@@ -198,7 +208,7 @@ class _PanelWidgetState extends State<PanelWidget> {
         actions: <Widget>[
           if(_panelIndex == 0) ...[
             if(_webControls) ...[
-              NavigationControls(manager: settingsManager, controller: controller),
+              NavigationControls(manager: settingsManager, controller: controller, codexURL: _codexURL),
             ],
             MenuAnchor(
             builder: (BuildContext context, MenuController controller, Widget? child) {
