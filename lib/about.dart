@@ -29,7 +29,7 @@ class _AboutPanelState extends State<AboutPanel> {
         onTap: () {
           _launchUrl(Uri.parse('https://github.com/MightyOakEntertainment/Papyrus'));
           },
-        child: SvgPicture.asset('assets/svg/Mighty-Oak-Entertainment-Logo.svg', colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),),
+        child: SvgPicture.asset('assets/svg/Mighty-Oak-Entertainment-Logo.svg', colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),),
       ),
     );
   }

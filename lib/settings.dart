@@ -228,7 +228,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
           Card(
             child: paddedTopBottom(ListTile(
               leading: const Icon(Icons.palette),
-              title: Text('Accent Color'),
+              title: const Text('Accent Color'),
               subtitle: Text(getAccentName(widget.manager.accentColor)),
                 trailing: MenuAnchor(
                   builder: (BuildContext context, MenuController controller, Widget? child) {
