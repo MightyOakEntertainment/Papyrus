@@ -14,11 +14,27 @@ Future<void> main() async {
 
   await setupServiceLocator();
 
-  runApp(const Papyrus());
+  runApp(Papyrus());
+}
+
+Color getAccentColor(int index) {
+  switch (index) {
+    case 0:
+    return Colors.blue;
+    case 1:
+    return Colors.deepPurple;
+    case 2:
+    return const Color.fromARGB(255, 255, 156, 0);
+    case 3:
+    return Colors.red;
+  }
+  return Colors.blue;
 }
 
 class Papyrus extends StatelessWidget {
-  const Papyrus({super.key});
+  Papyrus({super.key});
+
+  final settingsManager = serviceLocator<SettingsManager>();
 
   // This widget is the root of your application.
   @override
@@ -27,12 +43,48 @@ class Papyrus extends StatelessWidget {
       title: 'Papyrus',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blue,
+          seedColor: getAccentColor(settingsManager.accentColor),
           brightness: Brightness.dark,
+          background: const Color.fromARGB(255, 18, 18, 18),
         ),
         useMaterial3: true,
+        drawerTheme: const DrawerThemeData(
+          surfaceTintColor: Colors.transparent,
+          backgroundColor: Color.fromARGB(255, 33, 33, 33),
+        ),
+        dividerTheme: const DividerThemeData(
+          color: Color.fromARGB(255, 42, 42, 42),
+        ),
+        appBarTheme: AppBarTheme(
+          backgroundColor: const Color.fromARGB(255, 33, 33, 33), //Theme.of(context).colorScheme.inversePrimary,
+          shadowColor: Theme.of(context).colorScheme.shadow,
+        ),
+        menuTheme: MenuThemeData(
+          style: MenuStyle(
+            surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
+            backgroundColor: MaterialStateProperty.resolveWith((states) {
+              if (states.contains(MaterialState.pressed)) {
+                return getAccentColor(settingsManager.accentColor);
+              }
+              return const Color.fromARGB(255, 42, 42, 42);
+            }),
+          )
+        ),
+        menuButtonTheme: MenuButtonThemeData(
+            style: ButtonStyle(
+              surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
+              backgroundColor: MaterialStateProperty.resolveWith((states) {
+                if (states.contains(MaterialState.pressed)) {
+                  return getAccentColor(settingsManager.accentColor);
+                }
+                return const Color.fromARGB(255, 42, 42, 42);
+              }),
+            ),
+        ),
         cardTheme: CardTheme(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+          surfaceTintColor: Colors.transparent,
+          color: const Color.fromARGB(255, 42, 42, 42),
         ),
         inputDecorationTheme: InputDecorationTheme(
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.0)),
@@ -63,7 +115,6 @@ class _PanelWidgetState extends State<PanelWidget> {
   int _panelIndex = 0;
   int loadingPercentage = 0;
   bool fullscreenMode = false;
-  bool shadowColor = false;
   double? scrolledUnderElevation;
   List<MenuItemButton> webViewMenu = List<MenuItemButton>.empty(growable: true);
 
@@ -127,6 +178,21 @@ class _PanelWidgetState extends State<PanelWidget> {
   _onSelectItem(int index) {
     setState(() => _panelIndex = index);
     Navigator.of(context).pop(); // close the drawer
+  }
+
+  Card panelButton(int index){
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(60.0)),
+      surfaceTintColor: Colors.transparent,
+      color: _panelIndex == index ? Theme.of(context).colorScheme.inversePrimary : Colors.transparent,
+      shadowColor: _panelIndex == index ? Theme.of(context).colorScheme.shadow : Colors.transparent,
+      child: ListTile(
+        title: Text(panels[index].title),
+        leading: _panelIndex == index ? panels[index].selectedIcon : panels[index].icon,
+        selected: _panelIndex == index,
+        onTap: () => _onSelectItem(index),
+      ),
+    );
   }
 
   List<AppPanel> panels = List<AppPanel>.empty(growable: true);
@@ -203,11 +269,8 @@ class _PanelWidgetState extends State<PanelWidget> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: !fullscreenMode ? AppBar(
-        // Can be a straight color using Colors.amber for example
-        backgroundColor: Colors.black,//Theme.of(context).colorScheme.inversePrimary,
         title: Text(panels[_panelIndex].title),
         scrolledUnderElevation: scrolledUnderElevation,
-        shadowColor: shadowColor ? Theme.of(context).colorScheme.shadow : null,
         actions: <Widget>[
           if(_panelIndex == 0) ...[
             if(_webControls) ...[
@@ -253,33 +316,15 @@ class _PanelWidgetState extends State<PanelWidget> {
                         ),
                       ),
                       const Divider(),
-                      ListTile(
-                        title: Text(panels[0].title),
-                        leading: _panelIndex == 0 ? panels[0].selectedIcon : panels[0].icon,
-                        //selected: _panelIndex == 0,
-                        onTap: () => _onSelectItem(0),
-                        tileColor: _panelIndex == 0 ? Theme.of(context).colorScheme.inversePrimary : Colors.transparent,
-                      ),
-                      ListTile(
-                        title: Text(panels[1].title),
-                        leading: _panelIndex == 1 ? panels[1].selectedIcon : panels[1].icon,
-                        //selected: _panelIndex == 1,
-                        onTap: () => _onSelectItem(1),
-                        tileColor: _panelIndex == 1 ? Theme.of(context).colorScheme.inversePrimary : Colors.transparent,
-                      ),
+                      panelButton(0),
+                      panelButton(1),
                     ],
                   )
               ),
               const Divider(),
               Align(
                 alignment: FractionalOffset.bottomCenter,
-                child:ListTile(
-                  title: Text(panels[2].title),
-                  leading: _panelIndex == 2 ? panels[2].selectedIcon : panels[2].icon,
-                  //selected: _panelIndex == 2,
-                  onTap: () => _onSelectItem(2),
-                  tileColor: _panelIndex == 2 ? Theme.of(context).colorScheme.inversePrimary : Colors.transparent,
-                ),
+                child:panelButton(2),
               )
             ]
         ),

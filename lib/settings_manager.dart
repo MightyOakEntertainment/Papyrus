@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -11,6 +12,7 @@ const String _opdsV2Key       = 'opdsV2';
 const String _opdsURLKey      = 'opdsURL';
 const String _usernameKey     = 'username';
 const String _passwordKey     = 'password';
+const String _accentColorKey  = 'accentColor';
 
 class SettingsManager {
   static SettingsManager? _instance;
@@ -42,6 +44,10 @@ class SettingsManager {
   // Persist and retrieve opds URL
   String get opdsURL => _getData(_opdsURLKey) ?? "http://192.168.0.0:9810/opds/v1.2/r/0/1";
   set opdsURL(String value) => _saveData(_opdsURLKey, value);
+
+  // Persist and retrieve accent Color
+  int get accentColor => _getData(_accentColorKey) ?? 0;
+  set accentColor(int value) => _saveData(_accentColorKey, value);
 
   Future<String> getUsername() async {
     final value = await _secureStorage.read(key: _usernameKey);
