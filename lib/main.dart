@@ -26,7 +26,10 @@ class Papyrus extends StatelessWidget {
     return MaterialApp(
       title: 'Papyrus',
       theme: ThemeData(
-        colorScheme: const ColorScheme.dark(),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.blue,
+          brightness: Brightness.dark,
+        ),
         useMaterial3: true,
       ),
       home: const PanelWidget(),
@@ -188,7 +191,7 @@ class _PanelWidgetState extends State<PanelWidget> {
       key: _scaffoldKey,
       appBar: !fullscreenMode ? AppBar(
         // Can be a straight color using Colors.amber for example
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Colors.black,//Theme.of(context).colorScheme.inversePrimary,
         title: Text(panels[_panelIndex].title),
         scrolledUnderElevation: scrolledUnderElevation,
         shadowColor: shadowColor ? Theme.of(context).colorScheme.shadow : null,
@@ -223,27 +226,50 @@ class _PanelWidgetState extends State<PanelWidget> {
             ),
         ],
       ),
-      drawer: NavigationDrawer(
-        onDestinationSelected: _onSelectItem,
-        selectedIndex: _panelIndex,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.fromLTRB(28, 16, 16, 10),
-            child: Text(
-              'Papyrus',
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
-          ),
-          ...panels.map(
-                (AppPanel panel) {
-              return NavigationDrawerDestination(
-                label: Text(panel.title),
-                icon: panel.icon,
-                selectedIcon: panel.selectedIcon,
-              );
-            },
-          ),
-        ],
+      drawer: Drawer(
+        child: Column(
+            children: <Widget>[
+              Expanded(
+                  child: ListView(
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 10, 16, 10),
+                        child: Text(
+                          'Papyrus',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                      ),
+                      const Divider(),
+                      ListTile(
+                        title: Text(panels[0].title),
+                        leading: _panelIndex == 0 ? panels[0].selectedIcon : panels[0].icon,
+                        //selected: _panelIndex == 0,
+                        onTap: () => _onSelectItem(0),
+                        tileColor: _panelIndex == 0 ? Theme.of(context).colorScheme.inversePrimary : Colors.transparent,
+                      ),
+                      ListTile(
+                        title: Text(panels[1].title),
+                        leading: _panelIndex == 1 ? panels[1].selectedIcon : panels[1].icon,
+                        //selected: _panelIndex == 1,
+                        onTap: () => _onSelectItem(1),
+                        tileColor: _panelIndex == 1 ? Theme.of(context).colorScheme.inversePrimary : Colors.transparent,
+                      ),
+                    ],
+                  )
+              ),
+              const Divider(),
+              Align(
+                alignment: FractionalOffset.bottomCenter,
+                child:ListTile(
+                  title: Text(panels[2].title),
+                  leading: _panelIndex == 2 ? panels[2].selectedIcon : panels[2].icon,
+                  //selected: _panelIndex == 2,
+                  onTap: () => _onSelectItem(2),
+                  tileColor: _panelIndex == 2 ? Theme.of(context).colorScheme.inversePrimary : Colors.transparent,
+                ),
+              )
+            ]
+        ),
       ),
     );
   }
