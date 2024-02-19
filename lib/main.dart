@@ -3,6 +3,8 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter/services.dart';
 
 import 'about.dart';
+import 'downloads.dart';
+import 'opds.dart';
 import 'settings.dart';
 import 'navigation_controls.dart';
 import 'settings_manager.dart';
@@ -103,6 +105,13 @@ class AppPanel {
   final Widget selectedIcon;
   final Widget panel;
 }
+
+/*Padding paddedTitle(Text text){
+  return Padding(
+    padding: const EdgeInsets.fromLTRB(16, 6, 0, 6),
+    child:text,
+  );
+}*/
 
 class PanelWidget extends StatefulWidget {
   const PanelWidget({super.key});
@@ -235,9 +244,11 @@ class _PanelWidgetState extends State<PanelWidget> {
       )
       ..setJavaScriptMode(JavaScriptMode.unrestricted);
 
-    panels.add(AppPanel('Codex', const Icon(Icons.visibility_outlined), const Icon(Icons.visibility), WebViewWidget(controller: controller)));
-    panels.add(AppPanel('Settings', const Icon(Icons.settings_outlined), const Icon(Icons.settings), SettingsPanel(manager: settingsManager)));
     panels.add(const AppPanel('About', Icon(Icons.info_outlined), Icon(Icons.info), AboutPanel()));
+    panels.add(AppPanel('Settings', const Icon(Icons.settings_outlined), const Icon(Icons.settings), SettingsPanel(manager: settingsManager)));
+    panels.add(AppPanel('Codex', const Icon(Icons.visibility_outlined), const Icon(Icons.visibility), WebViewWidget(controller: controller)));
+    panels.add(const AppPanel('OPDS', Icon(Icons.rss_feed_outlined), Icon(Icons.rss_feed), OpdsPanel()));
+    panels.add(const AppPanel('Downloads', Icon(Icons.download_outlined), Icon(Icons.download), DownloadsPanel()));
   }
 
 
@@ -272,7 +283,7 @@ class _PanelWidgetState extends State<PanelWidget> {
         title: Text(panels[_panelIndex].title),
         scrolledUnderElevation: scrolledUnderElevation,
         actions: <Widget>[
-          if(_panelIndex == 0) ...[
+          if(_panelIndex == 2) ...[
             if(_webControls) ...[
               NavigationControls(manager: settingsManager, controller: controller, codexURL: _codexURL),
             ],
@@ -316,7 +327,13 @@ class _PanelWidgetState extends State<PanelWidget> {
                         ),
                       ),
                       const Divider(),
-                      panelButton(0),
+                      paddedTitle(const Text('Network Libraries')),
+                      panelButton(2),
+                      panelButton(3),
+                      const Divider(),
+                      paddedTitle(const Text('Local Library')),
+                      panelButton(4),
+                      const Divider(),
                       panelButton(1),
                     ],
                   )
@@ -324,7 +341,7 @@ class _PanelWidgetState extends State<PanelWidget> {
               const Divider(),
               Align(
                 alignment: FractionalOffset.bottomCenter,
-                child:panelButton(2),
+                child:panelButton(0),
               )
             ]
         ),
