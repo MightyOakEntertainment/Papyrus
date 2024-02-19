@@ -121,7 +121,7 @@ class PanelWidget extends StatefulWidget {
 }
 
 class _PanelWidgetState extends State<PanelWidget> {
-  int _panelIndex = 0;
+  int _panelIndex = 2;
   int loadingPercentage = 0;
   bool fullscreenMode = false;
   double? scrolledUnderElevation;
