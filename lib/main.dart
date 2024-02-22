@@ -6,6 +6,7 @@ import 'about.dart';
 import 'downloads.dart';
 import 'opds.dart';
 import 'settings.dart';
+import 'sliding_appbar.dart';
 import 'navigation_controls.dart';
 import 'settings_manager.dart';
 import 'service_locator.dart';
@@ -120,10 +121,11 @@ class PanelWidget extends StatefulWidget {
   State<PanelWidget> createState() => _PanelWidgetState();
 }
 
-class _PanelWidgetState extends State<PanelWidget> {
+class _PanelWidgetState extends State<PanelWidget> with SingleTickerProviderStateMixin {
   int _panelIndex = 2;
   int loadingPercentage = 0;
   bool fullscreenMode = false;
+  static const double barHeight = 80.0;
   double? scrolledUnderElevation;
   List<MenuItemButton> webViewMenu = List<MenuItemButton>.empty(growable: true);
 
@@ -209,8 +211,11 @@ class _PanelWidgetState extends State<PanelWidget> {
   @override
   void initState() {
     super.initState();
+
     controller = WebViewController();
+
     _loadSettings();
+
     controller
       ..setNavigationDelegate(
         NavigationDelegate(
@@ -225,21 +230,24 @@ class _PanelWidgetState extends State<PanelWidget> {
             });
           },
           onPageFinished: (url) {
-            if (url.contains('/c/')) {
-              setState(() {
-                SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
-                fullscreenMode = true;
-              });
-            }else{
-              setState(() {
-                SystemChrome.setEnabledSystemUIMode( SystemUiMode.manual, overlays: [ SystemUiOverlay.top, SystemUiOverlay.bottom, ], );
-                fullscreenMode = false;
-              });
-            }
             setState(() {
               loadingPercentage = 100;
             });
           },
+            onUrlChange: (change){
+            String url = change.url ?? '';
+              if (url.contains('/c/')) {
+                setState(() {
+                  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
+                  fullscreenMode = true;
+                });
+              }else{
+                setState(() {
+                  SystemChrome.setEnabledSystemUIMode( SystemUiMode.manual, overlays: [ SystemUiOverlay.top, SystemUiOverlay.bottom, ], );
+                  fullscreenMode = false;
+                });
+              }
+            }
         ),
       )
       ..setJavaScriptMode(JavaScriptMode.unrestricted);
@@ -250,7 +258,6 @@ class _PanelWidgetState extends State<PanelWidget> {
     panels.add(const AppPanel('OPDS', Icon(Icons.rss_feed_outlined), Icon(Icons.rss_feed), OpdsPanel()));
     panels.add(const AppPanel('Downloads', Icon(Icons.download_outlined), Icon(Icons.download), DownloadsPanel()));
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -279,31 +286,34 @@ class _PanelWidgetState extends State<PanelWidget> {
 
     return Scaffold(
       key: _scaffoldKey,
-      appBar: !fullscreenMode ? AppBar(
-        title: Text(panels[_panelIndex].title),
-        scrolledUnderElevation: scrolledUnderElevation,
-        actions: <Widget>[
-          if(_panelIndex == 2) ...[
-            if(_webControls) ...[
-              NavigationControls(manager: settingsManager, controller: controller, codexURL: _codexURL),
+      appBar: SlidingAppBar(
+          visible: !fullscreenMode,
+          appBar: AppBar(
+            title: Text(panels[_panelIndex].title),
+            toolbarHeight: barHeight,
+            scrolledUnderElevation: scrolledUnderElevation,
+            actions: <Widget>[
+              if(_panelIndex == 2) ...[
+                if(_webControls) ...[
+                  NavigationControls(manager: settingsManager, controller: controller, codexURL: _codexURL),
+                ],
+                MenuAnchor(
+                builder: (BuildContext context, MenuController controller, Widget? child) {
+                  return IconButton(
+                    onPressed: () {
+                      if (controller.isOpen) {
+                        controller.close();
+                      } else {
+                        controller.open();
+                      }},
+                    icon: const Icon(Icons.more_vert),
+                    tooltip: 'Show menu',
+                  );},
+                menuChildren: webViewMenu,
+                ),
+              ],
             ],
-            MenuAnchor(
-            builder: (BuildContext context, MenuController controller, Widget? child) {
-              return IconButton(
-                onPressed: () {
-                  if (controller.isOpen) {
-                    controller.close();
-                  } else {
-                    controller.open();
-                  }},
-                icon: const Icon(Icons.more_vert),
-                tooltip: 'Show menu',
-              );},
-            menuChildren: webViewMenu,
-          ),
-          ],
-        ],
-      ) : null,
+          )),
       body: Stack(
         children: [
           panels[_panelIndex].panel,
