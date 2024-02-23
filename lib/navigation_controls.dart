@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import 'settings_manager.dart';
 
@@ -7,7 +7,7 @@ class NavigationControls extends StatelessWidget {
    const NavigationControls({super.key, required this.manager, required this.controller, required this.codexURL});
 
   final SettingsManager manager;
-  final WebViewController controller;
+  final InAppWebViewController controller;
   final String codexURL;
 
   @override
@@ -51,7 +51,7 @@ class NavigationControls extends StatelessWidget {
         IconButton(
           icon: const Icon(Icons.home),
           onPressed: () {
-            controller.loadRequest(Uri.parse(codexURL));
+            controller.loadUrl(urlRequest: URLRequest(url: WebUri(codexURL)));
           },
         ),
       ],

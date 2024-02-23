@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter/services.dart';
 
 import 'about.dart';
@@ -107,13 +107,6 @@ class AppPanel {
   final Widget panel;
 }
 
-/*Padding paddedTitle(Text text){
-  return Padding(
-    padding: const EdgeInsets.fromLTRB(16, 6, 0, 6),
-    child:text,
-  );
-}*/
-
 class PanelWidget extends StatefulWidget {
   const PanelWidget({super.key});
 
@@ -151,13 +144,12 @@ class _PanelWidgetState extends State<PanelWidget> with SingleTickerProviderStat
       _opdsURL      = settingsManager.opdsURL;
       _opdsUsername = username;
       _opdsPassword = password;*/
-      controller.loadRequest(Uri.parse(_codexURL),);
     });
   }
 
-  late final WebViewController controller;
+  late final InAppWebViewController webViewController;
 
-  final cookieManager = WebViewCookieManager();
+  final cookieManager = CookieManager();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   //Lists -- for Codex so kind of useless but kept for future reference
@@ -173,7 +165,7 @@ class _PanelWidgetState extends State<PanelWidget> with SingleTickerProviderStat
   }*/
 
   Future<void> _onClearCookies() async {
-    final hadCookies = await cookieManager.clearCookies();
+    final hadCookies = await cookieManager.deleteAllCookies();
     String message = 'There were cookies. Now, they are gone!';
     if (!hadCookies) {
       message = 'There were no cookies to clear.';
@@ -208,53 +200,58 @@ class _PanelWidgetState extends State<PanelWidget> with SingleTickerProviderStat
 
   List<AppPanel> panels = List<AppPanel>.empty(growable: true);
 
+  InAppWebView webView(){
+    return InAppWebView(
+      initialUrlRequest: URLRequest(url: WebUri(_codexURL)),
+      initialSettings: InAppWebViewSettings(
+          useOnDownloadStart: true
+      ),
+      onWebViewCreated: (controller) {
+        webViewController = controller;
+      },
+        onLoadStart: (controller, url) {
+        setState(() {
+          loadingPercentage = 0;
+        });
+        },
+        onProgressChanged: (controller, progress) {
+        setState(() {
+          loadingPercentage = progress;
+        });
+        },
+        onLoadStop: (controller, url) async {
+        setState(() {
+          loadingPercentage = 100;
+        });
+        },
+        onUpdateVisitedHistory: (controller, url, androidIsReload) {
+          setState(() {
+            String newUrl = url.toString();
+            if (newUrl.contains('/c/')) {
+              setState(() {
+                SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
+                fullscreenMode = true;
+              });
+            }else{
+              setState(() {
+                SystemChrome.setEnabledSystemUIMode( SystemUiMode.manual, overlays: [ SystemUiOverlay.top, SystemUiOverlay.bottom, ], );
+                fullscreenMode = false;
+              });
+            }
+          });
+        },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
 
-    controller = WebViewController();
-
     _loadSettings();
-
-    controller
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onPageStarted: (url) {
-            setState(() {
-              loadingPercentage = 0;
-            });
-          },
-          onProgress: (progress) {
-            setState(() {
-              loadingPercentage = progress;
-            });
-          },
-          onPageFinished: (url) {
-            setState(() {
-              loadingPercentage = 100;
-            });
-          },
-            onUrlChange: (change){
-            String url = change.url ?? '';
-              if (url.contains('/c/')) {
-                setState(() {
-                  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
-                  fullscreenMode = true;
-                });
-              }else{
-                setState(() {
-                  SystemChrome.setEnabledSystemUIMode( SystemUiMode.manual, overlays: [ SystemUiOverlay.top, SystemUiOverlay.bottom, ], );
-                  fullscreenMode = false;
-                });
-              }
-            }
-        ),
-      )
-      ..setJavaScriptMode(JavaScriptMode.unrestricted);
 
     panels.add(const AppPanel('About', Icon(Icons.info_outlined), Icon(Icons.info), AboutPanel()));
     panels.add(AppPanel('Settings', const Icon(Icons.settings_outlined), const Icon(Icons.settings), SettingsPanel(manager: settingsManager)));
-    panels.add(AppPanel('Codex', const Icon(Icons.visibility_outlined), const Icon(Icons.visibility), WebViewWidget(controller: controller)));
+    panels.add(AppPanel('Codex', const Icon(Icons.visibility_outlined), const Icon(Icons.visibility), webView()));
     panels.add(const AppPanel('OPDS', Icon(Icons.rss_feed_outlined), Icon(Icons.rss_feed), OpdsPanel()));
     panels.add(const AppPanel('Downloads', Icon(Icons.download_outlined), Icon(Icons.download), DownloadsPanel()));
   }
@@ -295,7 +292,7 @@ class _PanelWidgetState extends State<PanelWidget> with SingleTickerProviderStat
             actions: <Widget>[
               if(_panelIndex == 2) ...[
                 if(_webControls) ...[
-                  NavigationControls(manager: settingsManager, controller: controller, codexURL: _codexURL),
+                  NavigationControls(manager: settingsManager, controller: webViewController, codexURL: _codexURL),
                 ],
                 MenuAnchor(
                 builder: (BuildContext context, MenuController controller, Widget? child) {
