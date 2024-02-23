@@ -99,6 +99,7 @@ class Papyrus extends StatelessWidget {
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.0)),
         ),
       ),
+      //builder: (context, child) => SafeArea(child: child!), //Safeguard against Camera Notches
       home: const PanelWidget(),
     );
   }
@@ -130,7 +131,8 @@ class _PanelWidgetState extends State<PanelWidget> with SingleTickerProviderStat
   int _panelIndex = 2;
   int loadingPercentage = 0;
   bool fullscreenMode = false;
-  static const double barHeight = 80.0;
+  static double defaultBarHeight = 56; //default is 56 but 80 was required before SafeArea keeping for customization
+  double barHeight = defaultBarHeight; //Is resized during build to compensate for Camera Notches
   double? scrolledUnderElevation;
 
   List<AppPanel> panels = List<AppPanel>.empty(growable: true);
@@ -215,6 +217,15 @@ class _PanelWidgetState extends State<PanelWidget> with SingleTickerProviderStat
     );
   }
 
+  //Ran at build to compensate for Camera Notches while maintaining status bar theming
+  void handleCameraNotch(){
+    double notchSize = MediaQuery.of(context).viewPadding.top;
+
+    if(notchSize > 0){
+      barHeight = defaultBarHeight + notchSize;
+    }
+  }
+
   //Method used to return a setup InAppWebView
   InAppWebView webView(){
     return InAppWebView(
@@ -277,6 +288,8 @@ class _PanelWidgetState extends State<PanelWidget> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
+    handleCameraNotch();
+
     //We Populate the Web View Menu during build to accommodate changing the label on the Web Controls option
     webViewMenu.clear();
     webViewMenu.add(MenuItemButton(
