@@ -11,7 +11,7 @@ import 'navigation_controls.dart';
 import 'settings_manager.dart';
 import 'service_locator.dart';
 
-
+//Main Starts Here!
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -20,26 +20,32 @@ Future<void> main() async {
   runApp(Papyrus());
 }
 
+// ┌─────────────────────────────────────────────────────────────────────┐
+// | Theme Settings / Root Widget                                        |
+// └─────────────────────────────────────────────────────────────────────┘
+
+//Method for getting the current Accent Color based on it's index
 Color getAccentColor(int index) {
   switch (index) {
     case 0:
-    return Colors.blue;
+      return Colors.blue;
     case 1:
-    return Colors.deepPurple;
+      return Colors.deepPurple;
     case 2:
-    return const Color.fromARGB(255, 255, 156, 0);
+      return const Color.fromARGB(255, 255, 156, 0);
     case 3:
-    return Colors.red;
+      return Colors.red;
   }
   return Colors.blue;
 }
 
+//The Root Widget / Theme Settings
 class Papyrus extends StatelessWidget {
   Papyrus({super.key});
 
   final settingsManager = serviceLocator<SettingsManager>();
 
-  // This widget is the root of your application.
+  // This is where we set all Theme Settings when possible
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -98,6 +104,11 @@ class Papyrus extends StatelessWidget {
   }
 }
 
+// ┌─────────────────────────────────────────────────────────────────────┐
+// | Main Widget / Master Panel                                          |
+// └─────────────────────────────────────────────────────────────────────┘
+
+//Struct of an AppPanel
 class AppPanel {
   const AppPanel(this.title, this.icon, this.selectedIcon, this.panel);
 
@@ -107,6 +118,7 @@ class AppPanel {
   final Widget panel;
 }
 
+//Our Main Widget that contains the AppBar, Navigation Drawer, all Panels & any Controllers
 class PanelWidget extends StatefulWidget {
   const PanelWidget({super.key});
 
@@ -120,6 +132,8 @@ class _PanelWidgetState extends State<PanelWidget> with SingleTickerProviderStat
   bool fullscreenMode = false;
   static const double barHeight = 80.0;
   double? scrolledUnderElevation;
+
+  List<AppPanel> panels = List<AppPanel>.empty(growable: true);
   List<MenuItemButton> webViewMenu = List<MenuItemButton>.empty(growable: true);
 
   final settingsManager = serviceLocator<SettingsManager>();
@@ -132,6 +146,7 @@ class _PanelWidgetState extends State<PanelWidget> with SingleTickerProviderStat
   String  _opdsUsername = "";
   String  _opdsPassword = "";*/
 
+  //Allows for Asynchronous Loading of Settings
   Future<void> _loadSettings() async {
     //Not Needed Until OPDS Implementation
     /*final username = await settingsManager.getUsername();
@@ -183,6 +198,8 @@ class _PanelWidgetState extends State<PanelWidget> with SingleTickerProviderStat
     Navigator.of(context).pop(); // close the drawer
   }
 
+  //Method used to wrap any Drawer Button with a Card that only shows when selected
+  //This is done to give a Navigation Drawer like effect but with more customization
   Card panelButton(int index){
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(60.0)),
@@ -198,8 +215,7 @@ class _PanelWidgetState extends State<PanelWidget> with SingleTickerProviderStat
     );
   }
 
-  List<AppPanel> panels = List<AppPanel>.empty(growable: true);
-
+  //Method used to return a setup InAppWebView
   InAppWebView webView(){
     return InAppWebView(
       initialUrlRequest: URLRequest(url: WebUri(_codexURL)),
@@ -249,6 +265,9 @@ class _PanelWidgetState extends State<PanelWidget> with SingleTickerProviderStat
 
     _loadSettings();
 
+    //Populate the Panels list during Init as atm it does not need to be reloaded on each State Change
+    //This may change if a dynamic number of OPDS Libraries are eventually allowed
+    //Note: The list starts with About as 0 will always be used for the last panel in the drawer!
     panels.add(const AppPanel('About', Icon(Icons.info_outlined), Icon(Icons.info), AboutPanel()));
     panels.add(AppPanel('Settings', const Icon(Icons.settings_outlined), const Icon(Icons.settings), SettingsPanel(manager: settingsManager)));
     panels.add(AppPanel('Codex', const Icon(Icons.visibility_outlined), const Icon(Icons.visibility), webView()));
@@ -258,6 +277,7 @@ class _PanelWidgetState extends State<PanelWidget> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
+    //We Populate the Web View Menu during build to accommodate changing the label on the Web Controls option
     webViewMenu.clear();
     webViewMenu.add(MenuItemButton(
       onPressed: () =>
@@ -281,6 +301,8 @@ class _PanelWidgetState extends State<PanelWidget> with SingleTickerProviderStat
       child: const Text('Clear cookies'),
     ),);
 
+    //This is our root Scaffold which contains the master AppBar & Drawer
+    //The Body contains a universal loading bar and an AppPanel based on the current index
     return Scaffold(
       key: _scaffoldKey,
       appBar: SlidingAppBar(
